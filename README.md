@@ -1,6 +1,6 @@
-# 🚀 Starter LRST Project
+# 🚀 Starter LRTS Project
 
-A starter project built with Laravel + React + Tailwind (LRST) to help you accelerate modern web application development.
+A starter project built with Laravel + React + Tailwind + Shadcn (LRTS) to help you accelerate modern web application development.
 
 ---
 
