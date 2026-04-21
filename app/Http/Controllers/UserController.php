@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -74,39 +74,50 @@ class UserController extends Controller
     /**
      * Show edit user page
      */
-    public function edit(User $user): Response
+    public function edit(User $user)
     {
+        $roles = Role::whereIn('name', ['LEVEL1', 'LEVEL2'])
+            ->pluck('name')
+            ->values();
+
         return Inertia::render('Users/Edit', [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->getRoleNames(),
-            ],
-            'roles' => Role::pluck('name'),
+            'user' => $user,
+            'roles' => $roles,
+            'userRole' => $user->getRoleNames()->first(),
         ]);
     }
 
     /**
      * Update user
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(Request $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', "unique:users,email,{$user->id}"],
-            'roles' => ['required', 'array'],
+        $validator = Validator::make($request->all(), [
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
+            'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
+
+        // ❌ VALIDATION FAIL → pakai flash
+        if ($validator->fails()) {
+            $firstError = collect($validator->errors()->all())->first();
+
+            return redirect()
+                ->back()
+                ->with('error', $firstError);
+        }
+
+        // ✅ VALIDATION SUCCESS
+        $validated = $validator->validated();
 
         $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'username' => $validated['username'],
         ]);
 
-        $user->syncRoles($validated['roles']);
+        $user->syncRoles([$validated['role']]);
 
-        return redirect()->route('users.index')
-            ->with('success', 'User berhasil diupdate.');
+        return redirect()
+            ->route('dashboard.level3')
+            ->with('success', 'User berhasil diupdate');
     }
 
     /**
