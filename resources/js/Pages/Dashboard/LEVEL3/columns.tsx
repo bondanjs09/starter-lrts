@@ -116,7 +116,15 @@ export const columns: ColumnDef<User>[] = [
 
                                 <AlertDialogAction
                                     onClick={() => {
-                                        router.delete(`/users/${user.id}`);
+                                        router.delete(`/users/${user.id}`, {
+                                            preserveScroll: true,
+
+                                            onSuccess: () => {
+                                                router.reload({
+                                                    only: ["users", "flash"],
+                                                }); // 🔥 penting
+                                            },
+                                        });
                                     }}
                                 >
                                     Ya, Hapus
