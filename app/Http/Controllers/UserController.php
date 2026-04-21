@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 
 class UserController extends Controller
 {
@@ -125,17 +126,29 @@ class UserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
-        // Optional: jangan hapus superadmin
-        if ($user->hasRole('superadmin')) {
-            return back()->withErrors([
-                'error' => 'Superadmin tidak bisa dihapus.'
-            ]);
+        // ❌ Cegah hapus LEVEL3
+        if ($user->hasRole('LEVEL3')) {
+            return redirect()
+                ->back()
+                ->with('error', 'User LEVEL3 tidak bisa dihapus.');
         }
 
-        $user->delete();
+        // ❌ Cegah double delete
+        if (!$user->is_active) {
+            return redirect()
+                ->back()
+                ->with('warning', 'User sudah tidak aktif.');
+        }
 
-        return redirect()->route('users.index')
-            ->with('success', 'User berhasil dihapus.');
+        // ✅ Soft delete custom
+        $user->update([
+            'is_active' => 0,
+            'deleted_at' => Carbon::now(),
+        ]);
+
+        return redirect()
+            ->route('dashboard.level3')
+            ->with('success', 'User berhasil dinonaktifkan.');
     }
 
     /**

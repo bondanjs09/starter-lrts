@@ -54,6 +54,9 @@ Route::middleware(['auth', 'role:LEVEL3'])->group(function () {
 
     Route::put('/users/{user}', [UserController::class, 'update'])
         ->name('users.update');
+
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])
+        ->name('users.destroy');
 });
 
 /*
