@@ -1,5 +1,8 @@
 import React from "react";
 import { router } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 type User = {
@@ -9,24 +12,33 @@ type User = {
 };
 
 export default function Dashboard({ users }: { users: User[] }) {
+    const { props } = usePage() as any;
     const handleLogout = () => {
         router.post("/logout");
     };
+
+    useEffect(() => {
+        if (props.flash?.success) {
+            toast.success(props.flash.success);
+        }
+    }, [props.flash]);
+
     return (
         <div className="p-6">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Dashboard LEVEL3</h1>
-
-                {/* <button
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                >
-                    Logout
-                </button> */}
-                <Button variant="destructive" onClick={handleLogout}>
-                    LogOut
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        variant="default"
+                        onClick={() => router.get("/users/create")}
+                    >
+                        Add New User
+                    </Button>
+                    <Button variant="destructive" onClick={handleLogout}>
+                        LogOut
+                    </Button>
+                </div>
             </div>
 
             {/* Table */}

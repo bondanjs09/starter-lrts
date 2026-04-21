@@ -42,57 +42,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:LEVEL3'])->group(function () {
     Route::get('/dashboard/level3', [DashboardController::class, 'index'])
         ->name('dashboard.level3');
-});
 
-
-/*
-|--------------------------------------------------------------------------
-| Superadmin Routes (Role Protected)
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
-
-    /*
-    |--------------------------------------------------
-    | User Management
-    |--------------------------------------------------
-    */
-
-    // List users
-    Route::get('/users', [UserController::class, 'index'])
-        ->name('users.index');
-
-    // Create user page
     Route::get('/users/create', [UserController::class, 'create'])
         ->name('users.create');
 
-    // Store user
     Route::post('/users', [UserController::class, 'store'])
         ->name('users.store');
-
-    // Edit user page
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-        ->name('users.edit');
-
-    // Update user
-    Route::put('/users/{user}', [UserController::class, 'update'])
-        ->name('users.update');
-
-    // Delete user
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])
-        ->name('users.destroy');
-
-    /*
-    |--------------------------------------------------
-    | Reset Password (Admin Only)
-    |--------------------------------------------------
-    */
-
-    Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])
-        ->name('users.reset-password');
 });
-
 
 /*
 |--------------------------------------------------------------------------

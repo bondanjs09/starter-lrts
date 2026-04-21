@@ -22,12 +22,9 @@ class AuthController extends Controller
 
         // Attempt login
         if (!Auth::attempt($credentials)) {
-            // return back()->withErrors([
-            //     'username' => 'Username atau password salah.',
-            // ]);
-            throw ValidationException::withMessages([
-                'username' => ['Username atau password salah.'],
-            ]);
+            return redirect()
+                ->route('login')
+                ->with('error', 'Invalid credential.');
         }
 
         // Regenerate session (security)

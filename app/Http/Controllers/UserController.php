@@ -39,8 +39,11 @@ class UserController extends Controller
      */
     public function create(): Response
     {
+        $roles = Role::whereIn('name', ['LEVEL1', 'LEVEL2'])
+            ->pluck('name');
+
         return Inertia::render('Users/Create', [
-            'roles' => Role::pluck('name'),
+            'roles' => $roles
         ]);
     }
 
@@ -50,21 +53,22 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'roles' => ['required', 'array'],
+            'username' => ['required', 'unique:users,username'],
+            'password' => ['required', 'min:6', 'confirmed'],
+            'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => 'password123', // auto hashed via model
+            'username' => $validated['username'],
+            'password' => $validated['password'], // auto hash
+            'is_active' => true,
         ]);
 
-        $user->syncRoles($validated['roles']);
+        $user->assignRole($validated['role']);
 
-        return redirect()->route('users.index')
-            ->with('success', 'User berhasil dibuat.');
+        return redirect()
+            ->route('dashboard.level3')
+            ->with('success', 'User registered successfully.');
     }
 
     /**

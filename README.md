@@ -60,13 +60,19 @@ php artisan key:generate
 php artisan migrate
 ```
 
-9. Start frontend service:
+9. Run database seeder (RoleSeeder & SuperAdminSeeder):
+
+```bash
+php artisan db:seed
+```
+
+10. Start frontend service:
 
 ```bash
 npm run dev
 ```
 
-10. Start Laravel server:
+11. Start Laravel server:
 
 ```bash
 php artisan serve

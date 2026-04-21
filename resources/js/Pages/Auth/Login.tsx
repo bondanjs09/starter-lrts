@@ -13,13 +13,13 @@ export default function Login() {
         username: "",
         password: "",
     });
-    const { errors } = usePage().props as any;
+    const { props } = usePage() as any;
 
     useEffect(() => {
-        if (errors.username) {
-            toast.error(errors.username);
+        if (props.flash?.error) {
+            toast.error(props.flash.error);
         }
-    }, [errors]);
+    }, [props.flash]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

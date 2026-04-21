@@ -33,23 +33,22 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-    // public function share(Request $request): array
-    // {
-    //     return [
-    //         ...parent::share($request),
-    //         //
-    //     ];
-    // }
     public function share(Request $request): array
     {
         return [
             ...parent::share($request),
 
-            'errors' => function () use ($request) {
-                return $request->session()->get('errors')
-                    ? $request->session()->get('errors')->getBag('default')->getMessages()
-                    : (object) [];
-            },
+            // 'errors' => function () use ($request) {
+            //     return $request->session()->get('errors')
+            //         ? $request->session()->get('errors')->getBag('default')->getMessages()
+            //         : (object) [];
+            // },
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error'   => fn() => $request->session()->get('error'),
+                'warning' => fn() => $request->session()->get('warning'),
+                'info'    => fn() => $request->session()->get('info'),
+            ],
         ];
     }
 }
