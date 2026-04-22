@@ -89,37 +89,45 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::whereIn('name', ['LEVEL1', 'LEVEL2'])
-            ->pluck('name')
-            ->values();
+        if ($user->hasRole('LEVEL3')) {
+            return redirect()
+                ->route('dashboard.level3')
+                ->with('error', 'User LEVEL3 tidak bisa diedit.');
+        }
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
-            'roles' => $roles,
-            'userRole' => $user->getRoleNames()->first(),
+            'roles' => ['LEVEL1', 'LEVEL2'],
+            'userRole' => $user->roles->pluck('name')->first(),
         ]);
     }
 
     /**
      * Update user
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): RedirectResponse
     {
+        // ❌ Cegah edit LEVEL3
+        if ($user->hasRole('LEVEL3')) {
+            return redirect()
+                ->route('dashboard.level3')
+                ->with('error', 'User LEVEL3 tidak bisa diedit.');
+        }
+
+        // VALIDATION
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
             'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
 
-        // ❌ VALIDATION FAIL → pakai flash
         if ($validator->fails()) {
             $firstError = collect($validator->errors()->all())->first();
 
             return redirect()
-                ->back()
+                ->route('users.edit', $user->id)
                 ->with('error', $firstError);
         }
 
-        // ✅ VALIDATION SUCCESS
         $validated = $validator->validated();
 
         $user->update([
@@ -130,7 +138,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('dashboard.level3')
-            ->with('success', 'User berhasil diupdate');
+            ->with('success', 'User berhasil diupdate.');
     }
 
     /**
