@@ -33,6 +33,14 @@ export default function Login() {
             <div className="flex min-h-screen items-center justify-center bg-gray-100">
                 <Card className="w-full max-w-md shadow-lg">
                     <CardHeader>
+                        {/* LOGO */}
+                        <div className="flex justify-center mb-6">
+                            <img
+                                src="/images/login.png"
+                                alt="Logo"
+                                className="h-20 w-auto"
+                            />
+                        </div>
                         <CardTitle className="text-2xl font-bold text-center">
                             Login
                         </CardTitle>
