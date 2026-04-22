@@ -10,6 +10,7 @@ use Inertia\Response;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -54,7 +55,15 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users', 'username')
+                    ->where(function ($query) {
+                        return $query->where('is_active', 1); // 🔥 hanya cek yg aktif
+                    }),
+            ],
             'password' => ['required', 'confirmed', 'min:6'],
             'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
@@ -116,7 +125,16 @@ class UserController extends Controller
 
         // VALIDATION
         $validator = Validator::make($request->all(), [
-            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users', 'username')
+                    ->ignore($user->id)
+                    ->where(function ($query) {
+                        return $query->where('is_active', 1);
+                    }),
+            ],
             'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
 
