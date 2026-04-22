@@ -16,11 +16,35 @@ export default function Dashboard({ users }: { users: User[] }) {
         router.post("/logout");
     };
 
+    // useEffect(() => {
+    //     if (props.flash?.success) {
+    //         toast.success(props.flash.success);
+    //     }
+    // }, [props.flash]);
+
     useEffect(() => {
         if (props.flash?.success) {
             toast.success(props.flash.success);
         }
-    }, [props.flash]);
+    }, [props.flash?.success]);
+
+    useEffect(() => {
+        if (props.flash?.error) {
+            toast.error(props.flash.error);
+        }
+    }, [props.flash?.error]);
+
+    useEffect(() => {
+        if (props.flash?.warning) {
+            toast.warning(props.flash.warning);
+        }
+    }, [props.flash?.warning]);
+
+    useEffect(() => {
+        if (props.flash?.info) {
+            toast.info(props.flash.info);
+        }
+    }, [props.flash?.info]);
 
     return (
         <div className="p-6">

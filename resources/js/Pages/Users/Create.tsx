@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import { Portal } from "@radix-ui/react-portal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 import {
     Select,
@@ -25,10 +26,44 @@ export default function Create({ roles }: Props) {
         role: "",
     });
 
+    const { props } = usePage() as any;
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post("/users");
+        // post("/users");
+        post(`/users`, {
+            preserveState: true, // 🔥 WAJIB
+            preserveScroll: true,
+
+            onError: (errors) => {
+                console.log("ERROR:", errors);
+
+                Object.values(errors).forEach((error) => {
+                    const message = Array.isArray(error) ? error[0] : error;
+                    toast.error(message);
+                });
+            },
+        });
     };
+
+    // ✅ Flash handler (ONLY for success & global message)
+    useEffect(() => {
+        if (props.flash?.success) {
+            toast.success(props.flash.success);
+        }
+
+        if (props.flash?.error) {
+            toast.error(props.flash.error);
+        }
+
+        if (props.flash?.warning) {
+            toast.warning(props.flash.warning);
+        }
+
+        if (props.flash?.info) {
+            toast.info(props.flash.info);
+        }
+    }, [props.flash]);
 
     return (
         <div className="p-6 max-w-md mx-auto">

@@ -51,25 +51,37 @@ class UserController extends Controller
     /**
      * Store new user
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'username' => ['required', 'unique:users,username'],
-            'password' => ['required', 'min:6', 'confirmed'],
+        $validator = Validator::make($request->all(), [
+            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
+            'password' => ['required', 'confirmed', 'min:6'],
             'role' => ['required', 'in:LEVEL1,LEVEL2'],
         ]);
 
+        // ❌ VALIDATION FAIL → flash
+        if ($validator->fails()) {
+            $firstError = collect($validator->errors()->all())->first();
+
+            return redirect()
+                ->back()
+                ->with('error', $firstError);
+        }
+
+        // ✅ SUCCESS
+        $validated = $validator->validated();
+
         $user = User::create([
             'username' => $validated['username'],
-            'password' => $validated['password'], // auto hash
-            'is_active' => true,
+            'password' => bcrypt($validated['password']),
+            'is_active' => 1,
         ]);
 
         $user->assignRole($validated['role']);
 
         return redirect()
             ->route('dashboard.level3')
-            ->with('success', 'User registered successfully.');
+            ->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
